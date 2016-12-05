@@ -1,12 +1,14 @@
+(setq load-prefer-newer t)
+(package-initialize)
+
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
 
-(package-initialize)
-
+;; maximise
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
-(add-hook 'emacs-startup-hook 'toggle-frame-maximized)
 
+;; backups
 (setq version-control t     ;; Use version numbers for backups.
       kept-new-versions 10  ;; Number of newest versions to keep.
       kept-old-versions 0   ;; Number of oldest versions to keep.
@@ -30,7 +32,6 @@
   (let ((buffer-backed-up nil))
     (backup-buffer)))
 (add-hook 'before-save-hook  'force-backup-of-buffer)
-
 (setq smex-save-file "~/.smex")
 
 (windmove-default-keybindings)
@@ -38,6 +39,7 @@
 (load-theme 'monokai t)
 
 (setq frame-title-format "emacs")
+(setq initial-scratch-message "")
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -68,21 +70,40 @@
   (unless (minibufferp (current-buffer))
     (auto-complete-mode 1)))
 (global-auto-complete-mode t)
+(ac-flyspell-workaround)
 
 (require 'ido)
 (ido-mode t)
 (setq ido-save-directory-list-file "/tmp/ido.last")
 
 (require 'org)
+(require 'ox)
+(require 'ox-latex)
 (setq org-indent-mode t)
 (setq org-hide-leading-stars t)
 (setq org-startup-indented t)
+
 (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "CANCELLED(c)" "|" "DONE(d)")))
 (setq org-todo-keyword-faces '(("CANCELLED" . "yellow")))
+
 (setq org-completion-use-ido t)
 (setq org-return-follows-link t)
 (setq org-log-done 'time)
 (setq org-log-into-drawer t)
+(setq org-image-actual-width nil)
+(setq org-startup-with-latex-preview t)
+
+(setq org-latex-create-formula-image-program 'dvipng)
+(org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
+
+;; Org following links
+(setq org-link-frame-setup
+   (quote
+    ((vm . vm-visit-folder-other-frame)
+     (vm-imap . vm-visit-imap-folder-other-frame)
+     (gnus . org-gnus-no-new-news)
+     (file . find-file)
+     (wl . wl-other-frame))))
 
 ;; Make windmove work in org-mode
 (add-hook 'org-shiftup-final-hook 'windmove-up)
@@ -90,7 +111,6 @@
 (add-hook 'org-shiftdown-final-hook 'windmove-down)
 (add-hook 'org-shiftright-final-hook 'windmove-right)
 
-(setq org-refile-targets (quote (("offers.org" :maxlevel . 2))))
 (setq org-outline-path-complete-in-steps nil) 
 (setq org-refile-use-outline-path t)                 
 
@@ -121,11 +141,12 @@
 (setq flyspell-issue-message-flag nil)
 (setq ispell-extra-args '("--sug-mode=fast"))
 (setq ispell-dictionary "british")
-(setq ispell-personal-dictionary "~/.emacs.d/spell/.aspell.en.pws")
+(add-to-list 'ispell-skip-region-alist '("^#+BEGIN_SRC" . "^#+END_SRC"))
 
 (global-set-key (kbd "C-x o") 'flyspell-mode)
 (global-set-key (kbd "C-x p") 'flyspell-buffer)
 (global-set-key (kbd "C-x P") 'ispell-word)
+(global-set-key (kbd "C-x C-M-p") 'ispell)
 (global-set-key (kbd "C-x C-p") 'flyspell-check-previous-highlighted-word)
 (defun flyspell-check-next-highlighted-word ()
   "Custom function to spell check next highlighted word"
@@ -143,18 +164,7 @@
 ;; (add-hook 'text-mode-hook 't-word-wrap)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
  '(inhibit-startup-buffer-menu t)
  '(inhibit-startup-screen 1)
- '(setq initial-scratch-message "")
- '(org-agenda-files (quote ("~/MEGAsync/biz/bet/offers.org")))
+ '(org-agenda-files (quote ("~/MEGA/biz/bet/offers.org")))
  '(org-tags-column 0))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
