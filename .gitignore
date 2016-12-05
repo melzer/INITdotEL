@@ -1,2 +1,6 @@
 # ignore autocomplete files
 /ac-comphist.dat
+# ignore multi-cursor files
+/.mc-lists.el
+# ignore spelling files
+/spell/*
