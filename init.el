@@ -16,6 +16,7 @@
 ;; backups
 (setq auto-save-default nil)
 (setq make-backup-files nil)
+(setq auto-save-list-file-prefix nil)
 (setq smex-save-file "~/.smex")
 
 (windmove-default-keybindings)
