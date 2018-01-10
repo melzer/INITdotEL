@@ -155,6 +155,9 @@
   (ispell-word))
 (global-set-key (kbd "C-x M-p") 'flyspell-check-next-highlighted-word)
 
+;; enable move-text
+(move-text-default-bindings)
+
 ;; word-wrapping in org-mode
 (add-hook 'org-mode-hook #'(lambda () (visual-line-mode)))
 ;; (defun t-word-wrap()
@@ -164,7 +167,17 @@
 ;; (add-hook 'text-mode-hook 't-word-wrap)
 
 (custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(inhibit-startup-buffer-menu t)
  '(inhibit-startup-screen 1)
- '(org-agenda-files (quote ("~/MEGA/biz/bet/offers.org")))
+ '(org-startup-with-latex-preview nil)
  '(org-tags-column 0))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
