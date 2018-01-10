@@ -17,7 +17,7 @@
 (setq auto-save-default nil)
 (setq make-backup-files nil)
 (setq auto-save-list-file-prefix nil)
-(setq smex-save-file "~/.smex")
+(setq smex-save-file "C:/Users/Toby/AppData/Roaming/.smex")
 
 (windmove-default-keybindings)
 (delete-selection-mode 1)
@@ -61,7 +61,7 @@
 
 (require 'ido)
 (ido-mode t)
-(setq ido-save-directory-list-file "C:/Temp/ido.last")
+(setq ido-save-directory-list-file "C:/Users/AppData/Roaming/ido.last")
 
 (require 'org)
 (require 'ox)
@@ -128,6 +128,9 @@
 ;;   (setq-default fill-column -1)
 ;;   (setq auto-hscroll-mode nil))
 ;; (add-hook 'text-mode-hook 't-word-wrap)
+
+;; enable move-text
+(move-text-default-bindings)
 
 (custom-set-variables
  '(inhibit-startup-buffer-menu t)
