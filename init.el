@@ -32,7 +32,7 @@
   (let ((buffer-backed-up nil))
     (backup-buffer)))
 (add-hook 'before-save-hook  'force-backup-of-buffer)
-(setq smex-save-file "~/.smex")
+(setq smex-save-file "/tmp/.smex")
 
 (windmove-default-keybindings)
 (delete-selection-mode 1)
@@ -71,6 +71,28 @@
     (auto-complete-mode 1)))
 (global-auto-complete-mode t)
 (ac-flyspell-workaround)
+
+;; spell check
+(require 'flyspell)
+(setq flyspell-issue-message-flag nil)
+(setq ispell-extra-args '("--sug-mode=fast"))
+(setq ispell-dictionary "british")
+(add-to-list 'ispell-skip-region-alist '("^#+BEGIN_SRC" . "^#+END_SRC"))
+
+(global-set-key (kbd "C-x o") 'flyspell-mode)
+(global-set-key (kbd "C-x p") 'flyspell-buffer)
+(global-set-key (kbd "C-x P") 'ispell-word)
+(global-set-key (kbd "C-x C-M-p") 'ispell)
+(global-set-key (kbd "C-x C-p") 'flyspell-check-previous-highlighted-word)
+(defun flyspell-check-next-highlighted-word ()
+  "Custom function to spell check next highlighted word"
+  (interactive)
+  (flyspell-goto-next-error)
+  (ispell-word))
+(global-set-key (kbd "C-x M-p") 'flyspell-check-next-highlighted-word)
+
+;; enable move-text
+(move-text-default-bindings)
 
 (require 'ido)
 (ido-mode t)
@@ -135,28 +157,6 @@
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 (require 'org-autolist)
 (add-hook 'org-mode-hook (lambda () (org-autolist-mode)))
-
-;; spell check
-(require 'flyspell)
-(setq flyspell-issue-message-flag nil)
-(setq ispell-extra-args '("--sug-mode=fast"))
-(setq ispell-dictionary "british")
-(add-to-list 'ispell-skip-region-alist '("^#+BEGIN_SRC" . "^#+END_SRC"))
-
-(global-set-key (kbd "C-x o") 'flyspell-mode)
-(global-set-key (kbd "C-x p") 'flyspell-buffer)
-(global-set-key (kbd "C-x P") 'ispell-word)
-(global-set-key (kbd "C-x C-M-p") 'ispell)
-(global-set-key (kbd "C-x C-p") 'flyspell-check-previous-highlighted-word)
-(defun flyspell-check-next-highlighted-word ()
-  "Custom function to spell check next highlighted word"
-  (interactive)
-  (flyspell-goto-next-error)
-  (ispell-word))
-(global-set-key (kbd "C-x M-p") 'flyspell-check-next-highlighted-word)
-
-;; enable move-text
-(move-text-default-bindings)
 
 ;; word-wrapping in org-mode
 (add-hook 'org-mode-hook #'(lambda () (visual-line-mode)))
