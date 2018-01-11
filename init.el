@@ -16,8 +16,10 @@
       backup-by-copying t)  ;; Copy all files, don't rename them.
 (setq vc-make-backup-files t)
 (setq auto-save-list-file-prefix nil)
+(setq auto-save-default nil)
 ;; Default and per-save backups go here:
 (setq backup-directory-alist '(("" . "/tmp/backups/per-save")))
+(setq  '(("" . "/tmp/backups/per-save")))
 (defun force-backup-of-buffer ()
   ;; Make a special "per session" backup at the first save of each
   ;; emacs session.
