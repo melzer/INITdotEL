@@ -16,16 +16,17 @@
       backup-by-copying t)  ;; Copy all files, don't rename them.
 (setq vc-make-backup-files t)
 (setq auto-save-list-file-prefix nil)
-(setq auto-save-default nil)
+
 ;; Default and per-save backups go here:
-(setq backup-directory-alist '(("" . "/tmp/backups/per-save")))
-(setq  '(("" . "/tmp/backups/per-save")))
+(setq backup-directory-alist '(("." . "/tmp/backups/per-save/")))
+(setq auto-save-file-name-transforms '(("." "/tmp/auto-save" t)))
+
 (defun force-backup-of-buffer ()
   ;; Make a special "per session" backup at the first save of each
   ;; emacs session.
   (when (not buffer-backed-up)
     ;; Override the default parameters for per-session backups.
-    (let ((backup-directory-alist '(("" . "/tmp/backups/per-session")))
+    (let ((backup-directory-alist '(("." . "/tmp/backups/per-session/")))
           (kept-new-versions 3))
       (backup-buffer)))
   ;; Make a "per save" backup on each save.  The first save results in
@@ -34,6 +35,7 @@
   (let ((buffer-backed-up nil))
     (backup-buffer)))
 (add-hook 'before-save-hook  'force-backup-of-buffer)
+
 (setq smex-save-file "/tmp/.smex")
 
 (windmove-default-keybindings)
