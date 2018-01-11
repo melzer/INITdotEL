@@ -61,7 +61,7 @@
 
 (require 'ido)
 (ido-mode t)
-(setq ido-save-directory-list-file "C:/Users/AppData/Roaming/ido.last")
+(setq ido-save-directory-list-file "C:/Users/Toby/AppData/Roaming/ido.last")
 
 (require 'org)
 (require 'ox)
