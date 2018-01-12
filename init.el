@@ -8,6 +8,14 @@
 ;; maximise
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
+;; auto-save
+(defvar user-temporary-file-directory
+  (concat temporary-file-directory "auto-save" "/"))
+(setq auto-save-list-file-prefix
+      (concat user-temporary-file-directory ".auto-saves-"))
+(setq auto-save-file-name-transforms
+      `((".*" ,user-temporary-file-directory t)))
+
 ;; backups
 (setq version-control t     ;; Use version numbers for backups.
       kept-new-versions 10  ;; Number of newest versions to keep.
@@ -15,18 +23,21 @@
       delete-old-versions t ;; Don't ask to delete excess backup versions.
       backup-by-copying t)  ;; Copy all files, don't rename them.
 (setq vc-make-backup-files t)
-(setq auto-save-list-file-prefix nil)
 
 ;; Default and per-save backups go here:
-(setq backup-directory-alist '(("." . "/tmp/backups/per-save/")))
-(setq auto-save-file-name-transforms '(("." "/tmp/auto-save" t)))
+(setq backup-directory-alist
+      `(("." . "/tmp/backups/per-save")
+        (,tramp-file-name-regexp nil)))
+
+;; Disable saving
+;; (setq auto-save-default nil)
 
 (defun force-backup-of-buffer ()
   ;; Make a special "per session" backup at the first save of each
   ;; emacs session.
   (when (not buffer-backed-up)
     ;; Override the default parameters for per-session backups.
-    (let ((backup-directory-alist '(("." . "/tmp/backups/per-session/")))
+    (let ((backup-directory-alist `(("." . "/tmp/backups/per-session/")))
           (kept-new-versions 3))
       (backup-buffer)))
   ;; Make a "per save" backup on each save.  The first save results in
