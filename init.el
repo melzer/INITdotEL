@@ -198,7 +198,7 @@
           (progn
             (comment-or-uncomment-region $lbp $lep)
             (forward-line )))))))
-(global-set-key (kbd "M-;") 'xah-comment-dwim)
+(global-set-key (kbd "C-;") 'xah-comment-dwim)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
