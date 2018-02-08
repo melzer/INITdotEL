@@ -154,5 +154,4 @@
 (custom-set-variables
  '(inhibit-startup-buffer-menu t)
  '(inhibit-startup-screen 1)
- '(org-agenda-files (quote ("~/MEGA/biz/bet/offers.org")))
  '(org-tags-column 0))
