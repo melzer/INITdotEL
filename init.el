@@ -5,9 +5,6 @@
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
 
-;; maximise
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
-
 ;; auto-save
 (defvar user-temporary-file-directory
   (concat temporary-file-directory "auto-save" "/"))
@@ -61,9 +58,19 @@
 (show-paren-mode)
 (column-number-mode)
 (winner-mode t)
-(global-nlinum-mode t)
-(electric-pair-mode 1)
 (global-undo-tree-mode)
+(electric-pair-mode 1)
+
+(defun initialize-nlinum (&optional frame)
+  (require 'nlinum)
+  (add-hook 'prog-mode-hook 'nlinum-mode))
+(when (daemonp)
+  (add-hook 'window-setup-hook 'initialize-nlinum)
+  (defadvice make-frame (around toggle-nlinum-mode compile activate)
+    (nlinum-mode -1) ad-do-it (nlinum-mode 1)))
+
+;; maximise
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 
 (powerline-center-theme)
 (setq powerline-default-separator 'wave)
@@ -199,6 +206,13 @@
             (comment-or-uncomment-region $lbp $lep)
             (forward-line )))))))
 (global-set-key (kbd "C-;") 'xah-comment-dwim)
+
+;; define function to shutdown emacs server instance
+(defun server-shutdown ()
+  "Save buffers, Quit, and Shutdown (kill) server"
+  (interactive)
+  (save-some-buffers)
+  (kill-emacs))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
