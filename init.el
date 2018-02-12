@@ -205,7 +205,7 @@
           (progn
             (comment-or-uncomment-region $lbp $lep)
             (forward-line )))))))
-(global-set-key (kbd "C-;") 'xah-comment-dwim)
+(global-set-key (kbd "C-'") 'xah-comment-dwim)
 
 ;; define function to shutdown emacs server instance
 (defun server-shutdown ()
