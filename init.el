@@ -69,6 +69,7 @@
 (setq org-indent-mode t)
 (setq org-hide-leading-stars t)
 (setq org-startup-indented t)
+(setq org-hide-emphasis-markers t)
 
 (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "CANCELLED(c)" "|" "DONE(d)")))
 (setq org-todo-keyword-faces '(("CANCELLED" . "yellow")))
@@ -133,7 +134,7 @@
 (move-text-default-bindings)
 
 ;; better commenting
-(defun xah-comment-dwim ()
+(defun better-comment-dwim ()
   "Like `comment-dwim', but toggle comment if cursor is not at end of line."
   (interactive)
   (if (region-active-p)
@@ -149,7 +150,18 @@
           (progn
             (comment-or-uncomment-region $lbp $lep)
             (forward-line )))))))
-(global-set-key (kbd "C-;") 'xah-comment-dwim)
+(global-set-key (kbd "C-'") 'better-comment-dwim)
+
+;; useful keybindings
+(global-set-key (kbd "C-c s") 'ff-find-other-file)
+(global-set-key (kbd "C-c d") 'revert-buffer)
+(global-set-key (kbd "C-c r") 'query-replace)
+(global-set-key (kbd "M-g") 'goto-line)
+
+;; keyboard macros
+(global-set-key (kbd "M-[") 'start-kbd-macro)
+(global-set-key (kbd "M-]") 'end-kbd-macro)
+(global-set-key (kbd "M-[") 'call-last-kbd-macro)
 
 (custom-set-variables
  '(inhibit-startup-buffer-menu t)
