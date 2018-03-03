@@ -85,7 +85,7 @@
 (global-set-key (kbd "C-{") 'mc/mark-previous-like-this)
 
 (require 'switch-window)
-(global-set-key (kbd "C-M-z") 'switch-window) 
+(global-set-key (kbd "C-c w") 'switch-window) 
 
 (require 'auto-complete)
 (defun auto-complete-mode-maybe ()
@@ -188,8 +188,12 @@
 ;;   (setq auto-hscroll-mode nil))
 ;; (add-hook 'text-mode-hook 't-word-wrap)
 
+;; stop emacs from creating session files
+;; (defun emacs-session-filename (session-id)
+;;   "Overload function to stop creating session files (happens when computer is turned off without calling server-shutdown).")
+
 ;; better commenting
-(defun xah-comment-dwim ()
+(defun better-comment-dwim ()
   "Like `comment-dwim', but toggle comment if cursor is not at end of line."
   (interactive)
   (if (region-active-p)
@@ -205,11 +209,50 @@
           (progn
             (comment-or-uncomment-region $lbp $lep)
             (forward-line )))))))
-(global-set-key (kbd "C-'") 'xah-comment-dwim)
+(global-set-key (kbd "C-'") 'better-comment-dwim)
+
+(defun find-corresponding-file ()
+    "Find the file that corresponds to this one."
+    (interactive)
+    (setq CorrespondingFileName nil)
+    (setq BaseFileName (file-name-sans-extension buffer-file-name))
+    (if (string-match "\\.c" buffer-file-name)
+       (setq CorrespondingFileName (concat BaseFileName ".h")))
+    (if (string-match "\\.h" buffer-file-name)
+       (if (file-exists-p (concat BaseFileName ".c")) (setq CorrespondingFileName (concat BaseFileName ".c"))
+	   (setq CorrespondingFileName (concat BaseFileName ".cpp"))))
+    (if (string-match "\\.hin" buffer-file-name)
+       (setq CorrespondingFileName (concat BaseFileName ".cin")))
+    (if (string-match "\\.cin" buffer-file-name)
+       (setq CorrespondingFileName (concat BaseFileName ".hin")))
+    (if (string-match "\\.cpp" buffer-file-name)
+       (setq CorrespondingFileName (concat BaseFileName ".h")))
+    (if CorrespondingFileName (find-file CorrespondingFileName)
+       (error "Unable to find a corresponding file")))
+(defun find-corresponding-file-other-window ()
+  "Find the file that corresponds to this one."
+  (interactive)
+  (find-file-other-window buffer-file-name)
+  (find-corresponding-file)
+  (other-window -1))
+
+(global-set-key (kbd "C-c s") 'find-corresponding-file)
+(global-set-key (kbd "C-c S") 'find-corresponding-file-other-window)
+
+;; useful keybindings
+(global-set-key (kbd "C-c C-x C-c") 'server-shutdown)
+(global-set-key (kbd "C-c d") 'revert-buffer)
+(global-set-key (kbd "C-c r") 'query-replace)
+(global-set-key (kbd "M-g") 'goto-line)
+
+;; keyboard macros
+(global-set-key (kbd "M-[") 'start-kbd-macro)
+(global-set-key (kbd "M-]") 'end-kbd-macro)
+(global-set-key (kbd "M-[") 'call-last-kbd-macro)
 
 ;; define function to shutdown emacs server instance
 (defun server-shutdown ()
-  "Save buffers, Quit, and Shutdown (kill) server"
+  "Save buffers, quit, and shutdown server."
   (interactive)
   (save-some-buffers)
   (kill-emacs))
