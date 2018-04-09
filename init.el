@@ -189,8 +189,8 @@
 ;; (add-hook 'text-mode-hook 't-word-wrap)
 
 ;; stop emacs from creating session files
-;; (defun emacs-session-filename (session-id)
-;;   "Overload function to stop creating session files (happens when computer is turned off without calling server-shutdown).")
+(defadvice emacs-session-filename (around session-to-var activate)
+  (expand-file-name (concat "/tmp/session." session-id)))
 
 ;; better commenting
 (defun better-comment-dwim ()
