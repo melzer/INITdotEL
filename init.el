@@ -37,6 +37,9 @@
 (electric-pair-mode 1)
 (global-undo-tree-mode)
 
+;; make new line auto indented
+(define-key global-map (kbd "RET") 'newline-and-indent)
+
 (powerline-center-theme)
 (setq powerline-default-separator 'wave)
 (set-face-attribute 'default nil :height 110 :family "Consolas")
