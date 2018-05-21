@@ -137,6 +137,9 @@
 (setq org-image-actual-width nil)
 (setq org-startup-with-latex-preview t)
 
+;; indentation in src_blocks
+(setq org-src-tab-acts-natively t)
+
 (setq org-latex-create-formula-image-program 'dvipng)
 (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
 
@@ -211,6 +214,9 @@
             (forward-line )))))))
 (global-set-key (kbd "C-'") 'better-comment-dwim)
 
+;; set linux kernel style c comments
+(setq comment-style 'extra-line)
+
 (defun find-corresponding-file ()
     "Find the file that corresponds to this one."
     (interactive)
@@ -264,6 +270,8 @@
  ;; If there is more than one, they won't work right.
  '(inhibit-startup-buffer-menu t)
  '(inhibit-startup-screen 1)
+ '(org-hide-emphasis-markers t)
+ '(org-src-preserve-indentation t)
  '(org-startup-with-latex-preview nil)
  '(org-tags-column 0))
 (custom-set-faces
