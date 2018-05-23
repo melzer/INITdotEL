@@ -1,3 +1,7 @@
+;; TODO
+;; syntax checking
+;; magit
+
 (setq load-prefer-newer t)
 (package-initialize)
 
@@ -250,11 +254,6 @@
 (global-set-key (kbd "C-c d") 'revert-buffer)
 (global-set-key (kbd "C-c r") 'query-replace)
 (global-set-key (kbd "M-g") 'goto-line)
-
-;; keyboard macros
-(global-set-key (kbd "M-[") 'start-kbd-macro)
-(global-set-key (kbd "M-]") 'end-kbd-macro)
-(global-set-key (kbd "M-[") 'call-last-kbd-macro)
 
 ;; define function to shutdown emacs server instance
 (defun server-shutdown ()
