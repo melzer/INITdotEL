@@ -34,6 +34,10 @@
 (use-package switch-window
   :ensure t)
 
+(use-package winner
+  :ensure t
+  :init (winner-mode))
+
 (use-package counsel
   :ensure t
   :bind
