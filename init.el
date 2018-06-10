@@ -1,5 +1,6 @@
 ;; TODO
 ;; learn smartparens
+;; org mode settings
 
 ;; Packages
 (require 'package)
@@ -27,9 +28,16 @@
   :ensure t
   :config (which-key-mode))
 
+(use-package org
+  :ensure t
+  :config
+  (setq org-hide-leading-stars t)
+  (setq org-startup-indented t)
+  (add-hook 'org-mode-hook 'org-indent-mode))
+
 (use-package org-bullets
   :ensure t
-  :config (add-hook 'org-mode-hook (lambda () (org-mode-bullets 1))))
+  :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (use-package switch-window
   :ensure t)
@@ -54,6 +62,12 @@
   (setq ivy-display-style 'fancy)
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-wrap t))
+
+(use-package ido
+  :ensure t
+  :config
+  (ido-mode t)
+  (setq ido-save-directory-list-file "/tmp/ido.last"))
 
 (use-package monokai-theme
   :ensure t
@@ -248,9 +262,8 @@ is already narrowed."
 
  ;; counsel
  ("M-x" . counsel-M-x)
- ("C-x C-f" . counsel-find-file)
- ("C-x b" . list-buffers)
- ("C-x C-b" . ivy-switch-buffer)
+ ("C-x C-b" . list-buffers)
+ ("C-x b" . ivy-switch-buffer)
 
  ;; misc
  ("C-x g" . magit-status)
