@@ -4,9 +4,10 @@
 
 ;; TODO
 ;; learn smartparens
-;; set up auctex
+;; learn how to use reftex
 
 ;;; Code:
+
 ;; Packages
 (require 'package)
 (setq package-enable-at-startup nil)
@@ -31,6 +32,7 @@
 
 (use-package which-key
   :ensure t
+  :diminish which-key-mode
   :config (which-key-mode))
 
 (use-package org
@@ -84,7 +86,8 @@
   :config (load-theme 'monokai t))
 
 (use-package undo-tree
- :ensure t
+  :ensure t
+  :diminish undo-tree-mode
  :init (global-undo-tree-mode t))
 
 (use-package move-text
@@ -125,6 +128,54 @@
   (setq ispell-extra-args '("--sug-mode=fast"))
   (setq ispell-dictionary "british")
   (add-to-list 'ispell-skip-region-alist '("^#+BEGIN_SRC" . "^#+END_SRC")))
+
+(use-package latex
+  :ensure auctex
+  :mode ("\\.tex\\'" . latex-mode)
+  :init
+  (add-hook 'LaTeX-mode-hook (lambda ()
+			       (prettify-symbols-mode)
+			       (turn-on-reftex)
+			       (setq reftex-plug-into-AUCTeX t)
+			       (reftex-isearch-minor-mode)))
+
+  :config
+  (setq TeX-auto-save t)
+  (setq Tex-parse-self t)
+  (setq-default TeX-master nil)
+  (setq TeX-PDF-mode t)
+  (setq TeX-source-correlate-mode 'synctex)
+  (setq TeX-source-correlate-start-server t)
+  (setq TeX-source-correlate-mode t)
+  
+  ;; Update PDF buffers after successful LaTeX runs
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+
+  ;; Use pdfview with auctex
+  (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
+  (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
+	TeX-source-correlate-start-server t)
+  (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view"))))
+
+(use-package reftex
+  :ensure t
+  :defer t
+  :config
+  (setq reftex-cite-prompt-optional-args t))
+
+(use-package company-bibtex
+  :ensure t
+  :after latex
+  :config
+  (add-to-list 'company-backends 'company-bibtex)
+  (setq company-bibtex-bibliography '("~/MEGA/uni/bibliography/references.bib")))
+
+(use-package pdf-tools
+  :after latex
+  :ensure t
+  :mode ("\\.pdf\\'" . pdf-view-mode)
+  :config
+  (pdf-tools-install))
 
 (defun flyspell-check-next-highlighted-word ()
   "Custom function to spell check next highlighted word."
@@ -254,7 +305,7 @@ is already narrowed."
  ("C-c u" . flyspell-mode)
  ("C-c i" . flyspell-buffer)
  ("C-c I" . ispell-word)
- ("C-c C-M-i" . ispell)n
+ ("C-c C-M-i" . ispell)
  ("C-c M-i" . flyspell-check-previous-highlighted-word)
  ("C-c C-i" . flyspell-check-next-highlighted-word)
 
