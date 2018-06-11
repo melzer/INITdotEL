@@ -1,7 +1,12 @@
+;;; init.el --- My Emacs set up
+
+;;; Commentary:
+
 ;; TODO
 ;; learn smartparens
-;; org mode settings
+;; set up auctex
 
+;;; Code:
 ;; Packages
 (require 'package)
 (setq package-enable-at-startup nil)
@@ -33,11 +38,16 @@
   :config
   (setq org-hide-leading-stars t)
   (setq org-startup-indented t)
+  (setq org-hide-emphasis-markers t)
   (add-hook 'org-mode-hook 'org-indent-mode))
 
 (use-package org-bullets
   :ensure t
   :config (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(use-package org-autolist
+  :ensure t
+  :config (add-hook 'org-mode-hook (lambda () (org-autolist-mode))))
 
 (use-package switch-window
   :ensure t)
@@ -103,25 +113,21 @@
   (show-smartparens-global-mode t)
   (smartparens-global-mode t))
 
-(use-package auto-complete
+(use-package company
   :ensure t
-  :init
-  (progn
-    (global-auto-complete-mode t)
-    (ac-config-default)
-    (ac-flyspell-workaround)))
+  :config
+  (add-hook 'after-init-hook 'global-company-mode))
 
 (use-package flyspell
   :ensure t
   :config
-  (progn
-    (setq flyspell-issue-message-flag nil)
-    (setq ispell-extra-args '("--sug-mode=fast"))
-    (setq ispell-dictionary "british")
-    (add-to-list 'ispell-skip-region-alist '("^#+BEGIN_SRC" . "^#+END_SRC"))))
+  (setq flyspell-issue-message-flag nil)
+  (setq ispell-extra-args '("--sug-mode=fast"))
+  (setq ispell-dictionary "british")
+  (add-to-list 'ispell-skip-region-alist '("^#+BEGIN_SRC" . "^#+END_SRC")))
 
 (defun flyspell-check-next-highlighted-word ()
-  "Custom function to spell check next highlighted word"
+  "Custom function to spell check next highlighted word."
   (interactive)
   (flyspell-goto-next-error)
   (ispell-word))
@@ -130,7 +136,8 @@
   :ensure t)
 
 (use-package magit
-  :ensure t)
+  :ensure t
+  :config (setq magit-completing-read-function 'ivy-completing-read))
 
 ;; DWIM
 ;; better commenting
@@ -155,7 +162,7 @@
 (defun narrow-or-widen-dwim (p)
   "Widen if buffer is narrowed, narrow-dwim otherwise.
 Dwim means: region, org-src-block, org-subtree, or
-defun, whichever applies first. Narrowing to
+defun, whichever applies first.  Narrowing to
 org-src-block actually calls `org-edit-src-code'.
 With prefix P, don't widen, just narrow even if buffer
 is already narrowed."
@@ -235,6 +242,7 @@ is already narrowed."
 (setq comment-style 'extra-line)
 
 ;; Keys
+;; global
 (bind-keys*
  ("<f5>" . revert-buffer)
  ("C-c r" . query-replace)
@@ -242,19 +250,13 @@ is already narrowed."
  ("C-x C-c" . server-shutdown)
  ("C-'" . better-comment-dwim)
 
- ;; c/c++
- ("C-c j" . compile)
- ("C-c k" . next-error)
- ("C-c s" . find-corresponding-file)
- ("C-c S" . find-corresponding-file-other-window)
-
  ;; flyspell
- ("C-c o" . flyspell-mode)
- ("C-c p" . flyspell-buffer)
- ("C-c P" . ispell-word)
- ("C-c C-M-p" . ispell)
- ("C-c C-p" . flyspell-check-previous-highlighted-word)
- ("C-c M-p" . flyspell-check-next-highlighted-word)
+ ("C-c u" . flyspell-mode)
+ ("C-c i" . flyspell-buffer)
+ ("C-c I" . ispell-word)
+ ("C-c C-M-i" . ispell)n
+ ("C-c M-i" . flyspell-check-previous-highlighted-word)
+ ("C-c C-i" . flyspell-check-next-highlighted-word)
 
  ;; auto-yasnippet
  ("C-c w" . aya-create)
@@ -270,7 +272,17 @@ is already narrowed."
  ("M-/" . undo-tree-visualize)
  ("C-=" . er/expand-region)
  ("C-x o" . switch-window)
+ ("C-c l" . company-complete)
  )
+
+;; c/c++
+(use-package cc-mode
+  :defer t
+  :config (bind-keys :map c-mode-base-map
+	   ("C-c j" . compile)
+	   ("C-c k" . next-error)
+	   ("C-c s" . find-corresponding-file)
+	   ("C-c S" . find-corresponding-file-other-window)))
 
 ;; Saving
 ;; auto-save
@@ -312,3 +324,5 @@ is already narrowed."
     (backup-buffer)))
 (add-hook 'before-save-hook  'force-backup-of-buffer)
 
+(provide 'init)
+;;; init.el ends here
