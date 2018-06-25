@@ -5,5 +5,8 @@
 # track this file
 !.gitignore
 
+# track readme
+!readme.md
+
 # track init.el
 !init.el
