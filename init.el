@@ -1,4 +1,4 @@
-;;; init.el --- My Emacs set up
+;;; init.el --- My emacs set up
 
 ;;; Commentary:
 
@@ -108,6 +108,9 @@
   :ensure t)
 
 (use-package iedit
+  :ensure t)
+
+(use-package ace-jump-mode
   :ensure t)
 
 (use-package smartparens-config
@@ -300,6 +303,7 @@ is already narrowed."
  ("M-g" . goto-line)
  ("C-x C-c" . server-shutdown)
  ("C-'" . better-comment-dwim)
+ ("C-." . ace-jump-mode)
 
  ;; flyspell
  ("C-c u" . flyspell-mode)
