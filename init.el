@@ -27,6 +27,10 @@
 (require 'diminish)
 (require 'bind-key)
 
+;; don't vomit in my init file
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file 'noerror)
+
 (use-package try
   :ensure t)
 
@@ -40,7 +44,6 @@
   :config
   (setq org-hide-leading-stars t)
   (setq org-startup-indented t)
-  (setq org-hide-emphasis-markers t)
   (add-hook 'org-mode-hook 'org-indent-mode))
 
 (use-package org-bullets
@@ -81,9 +84,13 @@
   (ido-mode t)
   (setq ido-save-directory-list-file "/tmp/ido.last"))
 
-(use-package monokai-theme
+(use-package xresources-theme
+  :ensure t)
+
+(use-package powerline
   :ensure t
-  :config (load-theme 'monokai t))
+  :config
+  (powerline-center-theme))
 
 (use-package undo-tree
   :ensure t
@@ -98,20 +105,15 @@
   :ensure t
   :init (global-flycheck-mode t))
 
-(use-package powerline
-  :ensure t
-  :config
-  (powerline-center-theme)
-  (setq powerline-default-separator 'wave))
-
 (use-package expand-region
   :ensure t)
 
 (use-package iedit
   :ensure t)
 
-(use-package ace-jump-mode
-  :ensure t)
+(use-package avy
+  :ensure t
+  :config (setq avy-background t))
 
 (use-package smartparens-config
   :ensure smartparens
@@ -275,11 +277,24 @@ is already narrowed."
   (other-window -1))
 
 (defun server-shutdown ()
-  "Save buffers, quit, and shutdown server."
+  "Choose to shutdown frame or server."
   (interactive)
-  (save-some-buffers)
-  (kill-emacs))
-
+  (let* ((choices '("frame" "server" "cancel"))
+	 (fs-choice (ido-completing-read "Close: " choices)))
+    (if (string= fs-choice "frame")
+	(delete-frame))
+    (if (string= fs-choice "server")
+	(let* ((no-yes '("yes" "no"))
+	       (ny-choice (ido-completing-read "Shutdown server? " no-yes)))
+	  (if (string= ny-choice "yes")
+	      (progn
+		(save-some-buffers)
+		(kill-emacs)))
+	  )
+      )
+    )
+  )
+  
 ;; GUI
 (setq inhibit-startup-message t)
 (setq frame-title-format "emacs")
@@ -287,7 +302,37 @@ is already narrowed."
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
+(global-visual-line-mode)
+
+(set-face-attribute 'fringe nil :background nil)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
+(add-to-list 'default-frame-alist '(font . "Deja Vu Sans Mono 12"))
+
+;; theme
+(defvar my:theme 'xresources)
+(defvar my:theme-window-loaded nil)
+(defvar my:theme-terminal-loaded nil)
+
+(if (daemonp)
+    (add-hook 'after-make-frame-functions(lambda (frame)
+					   (select-frame frame)
+					   (if (window-system frame)
+					       (unless my:theme-window-loaded
+						 (if my:theme-terminal-loaded
+						     (enable-theme my:theme)
+						   (load-theme my:theme t))
+						 (setq my:theme-window-loaded t))
+					     (unless my:theme-terminal-loaded
+					       (if my:theme-window-loaded
+						   (enable-theme my:theme)
+						 (load-theme my:theme t))
+					       (setq my:theme-terminal-loaded t)))))
+
+  (progn
+    (load-theme my:theme t)
+    (if (display-graphic-p)
+        (setq my:theme-window-loaded t)
+      (setq my:theme-terminal-loaded t))))
 
 ;; editing
 (electric-pair-mode 1)
@@ -303,7 +348,11 @@ is already narrowed."
  ("M-g" . goto-line)
  ("C-x C-c" . server-shutdown)
  ("C-'" . better-comment-dwim)
- ("C-." . ace-jump-mode)
+ ("C-," . avy-goto-word-or-subword-1)
+ ("C-<" . avy-goto-char)
+
+ ;; C-z freezes emacs in i3
+ ("C-z" . switch-window)
 
  ;; flyspell
  ("C-c u" . flyspell-mode)
@@ -326,7 +375,6 @@ is already narrowed."
  ("C-x g" . magit-status)
  ("M-/" . undo-tree-visualize)
  ("C-=" . er/expand-region)
- ("C-x o" . switch-window)
  ("C-c l" . company-complete)
  )
 
