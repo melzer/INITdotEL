@@ -1,2 +1,2 @@
-# INITdotEL
-My init.el :sweat_drops: :sweat_drops: :sweat_drops:
+# dotemacs
+My emacs dot files :sweat_drops: :sweat_drops: :sweat_drops:
