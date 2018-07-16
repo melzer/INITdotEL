@@ -21,6 +21,7 @@
 ;; Bootstrap use-package
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
+  (package-install 'diminish)
   (package-install 'use-package))
 (eval-when-compile
   (require 'use-package))
@@ -55,7 +56,36 @@
   :config (add-hook 'org-mode-hook (lambda () (org-autolist-mode))))
 
 (use-package switch-window
-  :ensure t)
+  :ensure t
+  :config
+  (setq switch-window-shortcut-style 'qwerty)
+  (setq switch-window-qwerty-shortcuts
+    '("a" "s" "d" "f" "j" "k" "l" ";" "w" "e" "i" "o")))
+
+(use-package evil
+  :ensure t
+  :config
+  ;; enable evil
+  (evil-mode 1)
+
+  ;; put all of this somewhere else lol
+  
+  ;; stop escape being a prefix
+  (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
+
+  ;; make escape quit the minibuffer
+  (define-key evil-normal-state-map [escape] 'keyboard-quit)
+  (define-key evil-visual-state-map [escape] 'keyboard-quit)
+  (define-key minibuffer-local-map [escape] 'abort-recursive-edit)
+  (define-key minibuffer-local-ns-map [escape] 'abort-recursive-edit)
+  (define-key minibuffer-local-completion-map [escape] 'abort-recursive-edit)
+  (define-key minibuffer-local-must-match-map [escape] 'abort-recursive-edit)
+  (define-key minibuffer-local-isearch-map [escape] 'abort-recursive-edit)
+
+  ;; make C-w C-w use switch-window
+  (define-key evil-normal-state-map (kbd "C-w C-w") 'switch-window)
+  (define-key evil-insert-state-map (kbd "C-w C-w") 'switch-window)
+)
 
 (use-package winner
   :ensure t
@@ -90,7 +120,7 @@
 (use-package powerline
   :ensure t
   :config
-  (powerline-center-theme))
+  (powerline-center-evil-theme))
 
 (use-package undo-tree
   :ensure t
@@ -269,6 +299,7 @@ is already narrowed."
        (setq CorrespondingFileName (concat BaseFileName ".h")))
     (if CorrespondingFileName (find-file CorrespondingFileName)
        (error "Unable to find a corresponding file")))
+
 (defun find-corresponding-file-other-window ()
   "Find the file that corresponds to this one."
   (interactive)
@@ -284,14 +315,14 @@ is already narrowed."
     (if (string= fs-choice "frame")
 	(delete-frame))
     (if (string= fs-choice "server")
-	(let* ((no-yes '("yes" "no"))
-	       (ny-choice (ido-completing-read "Shutdown server? " no-yes)))
-	  (if (string= ny-choice "yes")
+	;; (let* ((no-yes '("yes" "no"))
+	       ;; (ny-choice (ido-completing-read "Shutdown server? " no-yes)))
+	  ;; (if (string= ny-choice "yes")
 	      (progn
 		(save-some-buffers)
 		(kill-emacs)))
-	  )
-      )
+	  ;; )
+      ;; )
     )
   )
   
@@ -304,11 +335,21 @@ is already narrowed."
 (scroll-bar-mode -1)
 (global-visual-line-mode)
 
-(set-face-attribute 'fringe nil :background nil)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (add-to-list 'default-frame-alist '(font . "Deja Vu Sans Mono 12"))
 
-;; theme
+;; fix up xresources theme
+(let* ((yellow (xresources-theme-color "color3"))
+       (blue (xresources-theme-color "color4"))
+       (white (xresources-theme-color "color15")))
+  (custom-theme-set-faces
+   'xresources
+
+   `(isearch ((t (:foreground ,white :weight bold :background ,blue))))
+   `(sp-show-pair-match-face ((t (:foreground ,white :background ,blue :weight bold))))
+   ))
+
+;; load theme
 (defvar my:theme 'xresources)
 (defvar my:theme-window-loaded nil)
 (defvar my:theme-terminal-loaded nil)
@@ -339,6 +380,7 @@ is already narrowed."
 (delete-selection-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq comment-style 'extra-line)
+(global-auto-revert-mode)
 
 ;; Keys
 ;; global
@@ -352,7 +394,7 @@ is already narrowed."
  ("C-<" . avy-goto-char)
 
  ;; C-z freezes emacs in i3
- ("C-z" . switch-window)
+ ;; ("C-." . switch-window)
 
  ;; flyspell
  ("C-c u" . flyspell-mode)

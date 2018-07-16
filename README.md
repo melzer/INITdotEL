@@ -1,2 +1,2 @@
-# INITdotEL
-My init.el :fire: :fire: :fire:
+# dotemacs
+My emacs dot files :fire: :fire: :fire:
