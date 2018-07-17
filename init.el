@@ -5,6 +5,7 @@
 ;; TODO
 ;; learn smartparens
 ;; learn how to use reftex
+;; set up latex/zathura
 
 ;;; Code:
 
@@ -181,15 +182,21 @@
   (setq TeX-source-correlate-mode 'synctex)
   (setq TeX-source-correlate-start-server t)
   (setq TeX-source-correlate-mode t)
+
+  ;; pdf-tools
   
   ;; Update PDF buffers after successful LaTeX runs
-  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
 
   ;; Use pdfview with auctex
-  (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
-  (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
-	TeX-source-correlate-start-server t)
-  (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view"))))
+  ;; (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
+  ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
+  ;; 	TeX-source-correlate-start-server t)
+  ;; (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
+
+  ;; zathura
+  (add-to-list 'TeX-view-program-selection '(output-pdf "Zathura"))
+  )
 
 (use-package reftex
   :ensure t
