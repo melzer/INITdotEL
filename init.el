@@ -83,7 +83,7 @@
   (define-key minibuffer-local-isearch-map [escape] 'abort-recursive-edit)
 
   ;; make evil use switch-window
-  (define-key evil-window-map (kbd "w") 'switch-window)
+  (define-key evil-window-map (kbd "C-w") 'switch-window)
 )
 
 (use-package winner
