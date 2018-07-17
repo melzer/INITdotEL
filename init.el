@@ -82,9 +82,8 @@
   (define-key minibuffer-local-must-match-map [escape] 'abort-recursive-edit)
   (define-key minibuffer-local-isearch-map [escape] 'abort-recursive-edit)
 
-  ;; make C-w C-w use switch-window
-  (define-key evil-normal-state-map (kbd "C-w C-w") 'switch-window)
-  (define-key evil-insert-state-map (kbd "C-w C-w") 'switch-window)
+  ;; make evil use switch-window
+  (define-key evil-window-map (kbd "w") 'switch-window)
 )
 
 (use-package winner
@@ -315,14 +314,9 @@ is already narrowed."
     (if (string= fs-choice "frame")
 	(delete-frame))
     (if (string= fs-choice "server")
-	;; (let* ((no-yes '("yes" "no"))
-	       ;; (ny-choice (ido-completing-read "Shutdown server? " no-yes)))
-	  ;; (if (string= ny-choice "yes")
-	      (progn
-		(save-some-buffers)
-		(kill-emacs)))
-	  ;; )
-      ;; )
+	(progn
+	  (save-some-buffers)
+	  (kill-emacs)))
     )
   )
   
@@ -338,16 +332,19 @@ is already narrowed."
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (add-to-list 'default-frame-alist '(font . "Deja Vu Sans Mono 12"))
 
-;; fix up xresources theme
-(let* ((yellow (xresources-theme-color "color3"))
-       (blue (xresources-theme-color "color4"))
-       (white (xresources-theme-color "color15")))
-  (custom-theme-set-faces
-   'xresources
+(defun fix-xresources ()
+  "Fix up xresouces theme."
+  (let* ((background (xresources-theme-color "background"))
+	 (yellow (xresources-theme-color "color1"))
+	 (blue (xresources-theme-color "color4"))
+	 (white (xresources-theme-color "color15")))
+    (custom-theme-set-faces
+     'xresources
 
-   `(isearch ((t (:foreground ,white :weight bold :background ,blue))))
-   `(sp-show-pair-match-face ((t (:foreground ,white :background ,blue :weight bold))))
-   ))
+     `(isearch ((t (:foreground ,background :weight bold :background ,blue))))
+     `(lazy-highlight ((t (:foreground ,background :weight light :background ,yellow))))
+     `(sp-show-pair-match-face ((t (:foreground ,white :background ,yellow :weight bold))))
+     )))
 
 ;; load theme
 (defvar my:theme 'xresources)
@@ -361,16 +358,19 @@ is already narrowed."
 					       (unless my:theme-window-loaded
 						 (if my:theme-terminal-loaded
 						     (enable-theme my:theme)
-						   (load-theme my:theme t))
+						   (load-theme my:theme t)
+						   (fix-xresources))
 						 (setq my:theme-window-loaded t))
 					     (unless my:theme-terminal-loaded
 					       (if my:theme-window-loaded
 						   (enable-theme my:theme)
-						 (load-theme my:theme t))
+						 (load-theme my:theme t)
+						 (fix-xresources))
 					       (setq my:theme-terminal-loaded t)))))
 
   (progn
     (load-theme my:theme t)
+    (fix-xresources)
     (if (display-graphic-p)
         (setq my:theme-window-loaded t)
       (setq my:theme-terminal-loaded t))))
@@ -394,7 +394,7 @@ is already narrowed."
  ("C-<" . avy-goto-char)
 
  ;; C-z freezes emacs in i3
- ;; ("C-." . switch-window)
+ ("C-w C-w" . switch-window)
 
  ;; flyspell
  ("C-c u" . flyspell-mode)
