@@ -3,9 +3,8 @@
 ;;; Commentary:
 
 ;; TODO
-;; learn smartparens
 ;; learn how to use reftex
-;; set up latex/zathura
+;; set up a leader (see spacemacs)
 
 ;;; Code:
 
@@ -159,6 +158,7 @@
 (use-package flyspell
   :ensure t
   :config
+  (setq ispell-program-name "aspell")
   (setq flyspell-issue-message-flag nil)
   (setq ispell-extra-args '("--sug-mode=fast"))
   (setq ispell-dictionary "british")
@@ -407,9 +407,9 @@ is already narrowed."
  ("C-c u" . flyspell-mode)
  ("C-c i" . flyspell-buffer)
  ("C-c I" . ispell-word)
- ("C-c C-M-i" . ispell)
  ("C-c M-i" . flyspell-check-previous-highlighted-word)
  ("C-c C-i" . flyspell-check-next-highlighted-word)
+ ("C-c C-M-i" . ispell)
 
  ;; auto-yasnippet
  ("C-c w" . aya-create)
