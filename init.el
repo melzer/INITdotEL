@@ -5,6 +5,9 @@
 ;; TODO
 ;; learn how to use reftex
 ;; set up a leader (see spacemacs)
+;; set up keybindings to go to specific files
+
+;; make a big agenda file that tracks all org files(?)
 
 ;;; Code:
 
@@ -40,12 +43,49 @@
   :diminish which-key-mode
   :config (which-key-mode))
 
+(use-package ido
+  :ensure t
+  :config
+  (ido-mode t)
+  (setq ido-save-directory-list-file "/tmp/ido.last"))
+
+(use-package counsel
+  :ensure t
+  :bind
+  (("M-y" . counsel-yank-pop)
+   :map ivy-minibuffer-map
+   ("M-y" . ivy-next-line)))
+
+(use-package ivy
+  :ensure t
+  :diminish ivy-mode
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-display-style 'fancy)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-wrap t))
+
 (use-package org
   :ensure t
   :config
   (setq org-hide-leading-stars t)
   (setq org-startup-indented t)
-  (add-hook 'org-mode-hook 'org-indent-mode))
+  (add-hook 'org-mode-hook 'org-indent-mode)
+
+  ;; org-refile stuff
+  (setq org-refile-targets '((nil :maxlevel . 9)
+			     (org-agenda-files :maxlevel . 9)))
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-refile-use-outline-path 'file)
+  (setq org-refile-allow-creating-parent-nodes 'confirm)
+
+  ;; enable fuzzy search in org-refile
+  (setq ivy-initial-inputs-alist (cdr (cdr ivy-initial-inputs-alist)))
+  
+  ;; org-goto
+  (setq org-goto-interface 'outline-path-completion)
+  )
 
 (use-package org-bullets
   :ensure t
@@ -84,34 +124,15 @@
 
   ;; make evil use switch-window
   (define-key evil-window-map (kbd "C-w") 'switch-window)
+
+  ;; make keys work in normal mode
+  (define-key evil-motion-state-map (kbd "RET") nil)
+  (define-key evil-motion-state-map (kbd "TAB") nil)
 )
 
 (use-package winner
   :ensure t
   :init (winner-mode))
-
-(use-package counsel
-  :ensure t
-  :bind
-  (("M-y" . counsel-yank-pop)
-   :map ivy-minibuffer-map
-   ("M-y" . ivy-next-line)))
-
-(use-package ivy
-  :ensure t
-  :diminish ivy-mode
-  :config
-  (ivy-mode 1)
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-display-style 'fancy)
-  (setq ivy-count-format "(%d/%d) ")
-  (setq ivy-wrap t))
-
-(use-package ido
-  :ensure t
-  :config
-  (ido-mode t)
-  (setq ido-save-directory-list-file "/tmp/ido.last"))
 
 (use-package xresources-theme
   :ensure t)
@@ -339,6 +360,8 @@ is already narrowed."
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (add-to-list 'default-frame-alist '(font . "Deja Vu Sans Mono 12"))
 
+(setq help-window-select t)
+
 (defun fix-xresources ()
   "Fix up xresouces theme."
   (let* ((background (xresources-theme-color "background"))
@@ -407,8 +430,8 @@ is already narrowed."
  ("C-c u" . flyspell-mode)
  ("C-c i" . flyspell-buffer)
  ("C-c I" . ispell-word)
- ("C-c M-i" . flyspell-check-previous-highlighted-word)
- ("C-c C-i" . flyspell-check-next-highlighted-word)
+ ("C-c C-i" . flyspell-check-previous-highlighted-word)
+ ("C-c M-i" . flyspell-check-next-highlighted-word)
  ("C-c C-M-i" . ispell)
 
  ;; auto-yasnippet
