@@ -130,6 +130,11 @@
   (define-key evil-motion-state-map (kbd "TAB") nil)
 )
 
+(use-package evil-surround
+  :ensure t
+  :config
+  (global-evil-surround-mode 1))
+
 (use-package winner
   :ensure t
   :init (winner-mode))
@@ -347,6 +352,16 @@ is already narrowed."
 	  (kill-emacs)))
     )
   )
+
+(defun my-dwim-kill ()
+  "Kill buffer and window if there are multiple windows open."
+  (interactive)
+  (ido-kill-buffer)
+  (if (> (count-windows) 1)
+      (progn
+	(delete-window)
+	(balance-windows)))
+  )
   
 ;; GUI
 (setq inhibit-startup-message t)
@@ -419,6 +434,7 @@ is already narrowed."
  ("C-c r" . query-replace)
  ("M-g" . goto-line)
  ("C-x C-c" . server-shutdown)
+ ("C-x k" . my-dwim-kill)
  ("C-'" . better-comment-dwim)
  ("C-," . avy-goto-word-or-subword-1)
  ("C-<" . avy-goto-char)
