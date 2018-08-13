@@ -102,8 +102,14 @@
   (setq switch-window-qwerty-shortcuts
     '("a" "s" "d" "f" "j" "k" "l" ";" "w" "e" "i" "o")))
 
+(use-package magit
+  :ensure t
+  :config (setq magit-completing-read-function 'ivy-completing-read))
+
 (use-package evil
   :ensure t
+  :init
+  (setq evil-want-integration nil)
   :config
   ;; enable evil
   (evil-mode 1)
@@ -134,6 +140,10 @@
   :ensure t
   :config
   (global-evil-surround-mode 1))
+
+(use-package evil-magit
+  :after evil
+  :ensure t)
 
 (use-package winner
   :ensure t
@@ -252,10 +262,6 @@
 
 (use-package auto-yasnippet
   :ensure t)
-
-(use-package magit
-  :ensure t
-  :config (setq magit-completing-read-function 'ivy-completing-read))
 
 ;; DWIM
 ;; better commenting
