@@ -85,6 +85,9 @@
   
   ;; org-goto
   (setq org-goto-interface 'outline-path-completion)
+
+  ;; org-latex preview size
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
   )
 
 (use-package org-bullets
@@ -368,7 +371,18 @@ is already narrowed."
 	(delete-window)
 	(balance-windows)))
   )
-  
+
+(defun my/org-render-latex-fragments ()
+  "Preview org latex fragments on save."
+  (if (org--list-latex-overlays)
+      (progn (org-toggle-latex-fragment)
+             (org-toggle-latex-fragment))
+    (org-toggle-latex-fragment)))
+
+(add-hook 'org-mode-hook
+          (lambda ()
+            (add-hook 'after-save-hook 'my/org-render-latex-fragments 'make-it-local)))
+
 ;; GUI
 (setq inhibit-startup-message t)
 (setq frame-title-format "emacs")
