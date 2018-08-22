@@ -8,6 +8,13 @@
 ;; set up keybindings to go to specific files
 
 ;; make a big agenda file that tracks all org files(?)
+;; see org-refile-targets
+
+;; issue with latex preview code (make toggling work)
+;; --> first latex equation in setion doesn't get previewed properly (toggled on then toggled off because there's two toggles)
+
+;; shortcut for inserting images in orgmode (go straight to misc/img)
+;; also ranger shortcut to move item to images folder
 
 ;;; Code:
 
@@ -64,7 +71,11 @@
   (setq ivy-use-virtual-buffers t)
   (setq ivy-display-style 'fancy)
   (setq ivy-count-format "(%d/%d) ")
-  (setq ivy-wrap t))
+  (setq ivy-wrap t)
+
+  ;; use enter on a directory to navigate into the directory, not open it with dired.
+  (define-key ivy-minibuffer-map (kbd "C-m") 'ivy-alt-done)
+  )
 
 (use-package org
   :ensure t
@@ -88,6 +99,9 @@
 
   ;; org-latex preview size
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+
+  ;; make c-c c-t toggle headings
+  (define-key org-mode-map (kbd "C-c C-t") 'org-ctrl-c-star)
   )
 
 (use-package org-bullets
@@ -97,6 +111,13 @@
 (use-package org-autolist
   :ensure t
   :config (add-hook 'org-mode-hook (lambda () (org-autolist-mode))))
+
+(use-package worf
+  :ensure t
+  :defer t
+  :init (add-hook 'org-mode-hook 'worf-mode)
+  :config
+  (define-key worf-mode-map (kbd "C-c C-j") 'worf-goto))
 
 (use-package switch-window
   :ensure t
@@ -187,7 +208,9 @@
   :ensure smartparens
   :config
   (show-smartparens-global-mode t)
-  (smartparens-global-mode t))
+  (smartparens-global-mode t)
+
+  (sp-local-pair 'org-mode "_" nil :actions :rem))
 
 (use-package company
   :ensure t
