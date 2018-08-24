@@ -536,6 +536,7 @@ is already narrowed."
  ("C-x g" . magit-status)
  ("M-/" . undo-tree-visualize)
  ("C-=" . er/expand-region)
+ ("C-+" . er/contract-region)
  ("C-c l" . company-complete)
  )
 
