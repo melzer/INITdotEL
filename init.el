@@ -4,17 +4,11 @@
 
 ;; TODO
 ;; learn how to use reftex
-;; set up a leader (see spacemacs)
+;; set up a leader (see spacemacs, evil-leader)
 ;; set up keybindings to go to specific files
 
 ;; make a big agenda file that tracks all org files(?)
 ;; see org-refile-targets
-
-;; issue with latex preview code (make toggling work)
-;; --> first latex equation in setion doesn't get previewed properly (toggled on then toggled off because there's two toggles)
-
-;; shortcut for inserting images in orgmode (go straight to misc/img)
-;; also ranger shortcut to move item to images folder
 
 ;;; Code:
 
@@ -25,8 +19,6 @@
                          ("marmalade" . "http://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
-
-(defalias 'list-buffers 'ibuffer-other-window)
 
 ;; Bootstrap use-package
 (unless (package-installed-p 'use-package)
@@ -50,11 +42,8 @@
   :diminish which-key-mode
   :config (which-key-mode))
 
-(use-package ido
-  :ensure t
-  :config
-  (ido-mode t)
-  (setq ido-save-directory-list-file "/tmp/ido.last"))
+(use-package hydra
+  :ensure t)
 
 (use-package counsel
   :ensure t
@@ -75,7 +64,9 @@
 
   ;; use enter on a directory to navigate into the directory, not open it with dired.
   (define-key ivy-minibuffer-map (kbd "C-m") 'ivy-alt-done)
-  )
+
+  (use-package ivy-hydra
+    :ensure t))
 
 (use-package org
   :ensure t
@@ -91,6 +82,12 @@
   (setq org-refile-use-outline-path 'file)
   (setq org-refile-allow-creating-parent-nodes 'confirm)
 
+  ;; org file apps
+  (setq org-file-apps (butlast org-file-apps))
+  (setq org-file-apps (append org-file-apps '(("\\.pdf::\\([0-9]+\\)\\'" . "zathura -P %1 %s")
+					      ("\\.png\\'" . "sxiv %s")
+					      ("\\.jpg\\'" . "sxiv %s"))))
+  
   ;; enable fuzzy search in org-refile
   (setq ivy-initial-inputs-alist (cdr (cdr ivy-initial-inputs-alist)))
   
@@ -98,11 +95,7 @@
   (setq org-goto-interface 'outline-path-completion)
 
   ;; org-latex preview size
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
-
-  ;; make c-c c-t toggle headings
-  (define-key org-mode-map (kbd "C-c C-t") 'org-ctrl-c-star)
-  )
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0)))
 
 (use-package org-bullets
   :ensure t
@@ -117,7 +110,13 @@
   :defer t
   :init (add-hook 'org-mode-hook 'worf-mode)
   :config
-  (define-key worf-mode-map (kbd "C-c C-j") 'worf-goto))
+  (define-key worf-mode-map (kbd "C-c C-j") 'worf-goto)
+
+  ;; can't type []
+  (define-key worf-mode-map (kbd "[") nil)
+  (define-key worf-mode-map (kbd "]") nil)
+  (worf-define-key worf-mode-map "[" 'worf-backward)
+  (worf-define-key worf-mode-map "]" 'worf-forward))
 
 (use-package switch-window
   :ensure t
@@ -158,6 +157,9 @@
   ;; make keys work in normal mode
   (define-key evil-motion-state-map (kbd "RET") nil)
   (define-key evil-motion-state-map (kbd "TAB") nil)
+
+  ;; make search case sensitive when there's a capital letter
+  (setq evil-ex-search-case 'sensitive)
 )
 
 (use-package evil-surround
@@ -195,9 +197,6 @@
   :init (global-flycheck-mode t))
 
 (use-package expand-region
-  :ensure t)
-
-(use-package iedit
   :ensure t)
 
 (use-package avy
@@ -375,36 +374,64 @@ is already narrowed."
   "Choose to shutdown frame or server."
   (interactive)
   (let* ((choices '("frame" "server" "cancel"))
-	 (fs-choice (ido-completing-read "Close: " choices)))
+	 (fs-choice (completing-read "Close: " choices)))
     (if (string= fs-choice "frame")
 	(delete-frame))
     (if (string= fs-choice "server")
 	(progn
 	  (save-some-buffers)
-	  (kill-emacs)))
-    )
-  )
+	  (kill-emacs)))))
 
-(defun my-dwim-kill ()
+(defun my/dwim-kill ()
   "Kill buffer and window if there are multiple windows open."
   (interactive)
   (ido-kill-buffer)
   (if (> (count-windows) 1)
       (progn
 	(delete-window)
-	(balance-windows)))
-  )
+	(balance-windows))))
+
+(defvar img-d "~/mega/misc/img")
+(defun my/img-complete-link ()
+  "Create an image link using competion."
+  (interactive)
+  (org-insert-link nil (concat "file:" (abbreviate-file-name (expand-file-name (read-file-name "Image: " img-d)))) nil))
+
+(define-key org-mode-map (kbd "C-c C-d") 'my/img-complete-link)
 
 (defun my/org-render-latex-fragments ()
-  "Preview org latex fragments on save."
-  (if (org--list-latex-overlays)
-      (progn (org-toggle-latex-fragment)
-             (org-toggle-latex-fragment))
-    (org-toggle-latex-fragment)))
+  "Render org latex fragments on save."
+  (save-excursion
+    (let (beg end)
+    (setq beg (if (org-at-heading-p) (line-beginning-position)
+		(outline-previous-heading)
+		(point)))
+    (setq end (progn (org-end-of-subtree t) (point)))
+    (if (org--list-latex-overlays beg end)
+	(progn (org-toggle-latex-fragment)
+               (org-toggle-latex-fragment))
+      (org-toggle-latex-fragment)))))
 
-(add-hook 'org-mode-hook
-          (lambda ()
-            (add-hook 'after-save-hook 'my/org-render-latex-fragments 'make-it-local)))
+;; org inlines all images regardless of description??
+(defun my/org-render-images ()
+  "Render org inline images on save."
+  (org-redisplay-inline-images))
+
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook (lambda () (my/org-render-latex-fragments)) nil 'make-it-local)))
+
+(defun my/org-toggle-headings ()
+  "Toggle headings in 'org-mode'."
+  (interactive)
+  (org-toggle-heading (org-current-level)))
+
+(define-key org-mode-map (kbd "C-c C-t") 'my/org-toggle-headings)
+
+;; splits
+(global-set-key (kbd "C-x 2") (lambda () (interactive) (split-window-vertically) (other-window 1)))
+(global-set-key (kbd "C-x 3") (lambda () (interactive) (split-window-horizontally) (other-window 1)))
+
+;; enter worf mode
+(global-set-key (kbd "C-c n") (lambda () (interactive) (worf-backward) (evil-insert 0)))
 
 ;; GUI
 (setq inhibit-startup-message t)
@@ -419,6 +446,8 @@ is already narrowed."
 (add-to-list 'default-frame-alist '(font . "Deja Vu Sans Mono 12"))
 
 (setq help-window-select t)
+
+(defalias 'list-buffers 'ibuffer-other-window)
 
 (defun fix-xresources ()
   "Fix up xresouces theme."
@@ -477,7 +506,8 @@ is already narrowed."
  ("C-c r" . query-replace)
  ("M-g" . goto-line)
  ("C-x C-c" . server-shutdown)
- ("C-x k" . my-dwim-kill)
+ ("C-x k" . my/dwim-kill)
+ ("C-x K" . kill-buffer)
  ("C-'" . better-comment-dwim)
  ("C-," . avy-goto-word-or-subword-1)
  ("C-<" . avy-goto-char)
