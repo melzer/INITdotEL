@@ -256,8 +256,7 @@
   ;; (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
 
   ;; zathura
-  (add-to-list 'TeX-view-program-selection '(output-pdf "Zathura"))
-  )
+  (add-to-list 'TeX-view-program-selection '(output-pdf "Zathura")))
 
 (use-package reftex
   :ensure t
@@ -287,6 +286,13 @@
 
 (use-package auto-yasnippet
   :ensure t)
+
+(use-package olivetti
+  :ensure t
+  :bind (("C-c b" . olivetti-toggle-hide-mode-line))
+  :config
+  (setq olivetti-body-width 80)
+  (define-key olivetti-mode-map (kbd "C-c b") '(lambda () (interactive) (olivetti-toggle-hide-mode-line) (force-mode-line-update))))
 
 ;; DWIM
 ;; better commenting
