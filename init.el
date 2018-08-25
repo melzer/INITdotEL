@@ -294,6 +294,9 @@
   (setq olivetti-body-width 80)
   (define-key olivetti-mode-map (kbd "C-c b") '(lambda () (interactive) (olivetti-toggle-hide-mode-line) (force-mode-line-update))))
 
+(use-package focus
+  :ensure t)
+
 ;; DWIM
 ;; better commenting
 (defun better-comment-dwim ()
