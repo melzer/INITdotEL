@@ -88,6 +88,8 @@
 					      ("\\.png\\'" . "sxiv %s")
 					      ("\\.jpg\\'" . "sxiv %s"))))
   
+  (add-to-list 'org-structure-template-alist
+	       '("r" "\\begin{align*}\n?\n\\end{align*}"))
   ;; enable fuzzy search in org-refile
   (setq ivy-initial-inputs-alist (cdr (cdr ivy-initial-inputs-alist)))
   
