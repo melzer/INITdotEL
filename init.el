@@ -112,7 +112,7 @@
   :defer t
   :init (add-hook 'org-mode-hook 'worf-mode)
   :config
-  (define-key worf-mode-map (kbd "C-c C-j") 'worf-goto)
+  (define-key worf-mode-map (kbd "C-c C-h") 'worf-goto)
 
   ;; can't type []
   (define-key worf-mode-map (kbd "[") nil)
