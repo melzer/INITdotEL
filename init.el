@@ -385,7 +385,7 @@ is already narrowed."
 (defun server-shutdown ()
   "Choose to shutdown frame or server."
   (interactive)
-  (let* ((choices '("frame" "server" "cancel"))
+  (let* ((choices '("frame" "server"))
 	 (fs-choice (completing-read "Close: " choices)))
     (if (string= fs-choice "frame")
 	(delete-frame))
