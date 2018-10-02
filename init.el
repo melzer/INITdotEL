@@ -1,3 +1,4 @@
+
 ;;; init.el --- My emacs set up
 
 ;;; Commentary:
@@ -118,8 +119,8 @@
   ;; can't type []
   (define-key worf-mode-map (kbd "[") nil)
   (define-key worf-mode-map (kbd "]") nil)
-  (worf-define-key worf-mode-map "[" 'worf-backward)
-  (worf-define-key worf-mode-map "]" 'worf-forward))
+  (worf-define-key worf-mode-map "[" 'worf-forward)
+  (worf-define-key worf-mode-map "]" 'worf-backward))
 
 (use-package switch-window
   :ensure t
