@@ -1,4 +1,3 @@
-
 ;;; init.el --- My emacs set up
 
 ;;; Commentary:
@@ -7,6 +6,9 @@
 ;; learn how to use reftex
 ;; set up a leader (see spacemacs, evil-leader)
 ;; set up keybindings to go to specific files
+
+;; problem with org-toggle-latex (subtree instead of section?)
+;; make worf-goto highlight current heading (look at source)
 
 ;; make a big agenda file that tracks all org files(?)
 ;; see org-refile-targets
@@ -191,6 +193,27 @@
 
     ;; bind evil-jump-out-args
     (define-key evil-normal-state-map "K" 'evil-jump-out-args)))
+
+(use-package web-mode
+  :ensure t
+  :mode ("\\.html$" . web-mode)
+  :init
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+
+  (setq web-mode-enable-auto-pairing t)
+  (setq web-mode-enable-auto-expanding t)
+  (setq web-mode-enable-css-colorization t))
+
+(use-package web-beautify
+  :ensure t
+  :commands (web-beautify-css
+             web-beautify-css-buffer
+             web-beautify-html
+             web-beautify-html-buffer
+             web-beautify-js
+             web-beautify-js-buffer))
 
 (use-package winner
   :ensure t
