@@ -15,10 +15,8 @@
 (setq package-enable-at-startup nil)
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("marmalade" . "http://marmalade-repo.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
+                         ("melpa" . "http://melpa.org/packages/")))
 (package-initialize)
-
-(defalias 'list-buffers 'ibuffer-other-window)
 
 ;; Bootstrap use-package
 (unless (package-installed-p 'use-package)
@@ -29,6 +27,13 @@
 (require 'diminish)
 (require 'bind-key)
 
+;; don't vomit in my init file
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file 'noerror)
+
+(defalias 'list-buffers 'ibuffer-other-window)
+(setq warning-minimum-level :emergency)
+
 (use-package try
   :ensure t)
 
@@ -36,6 +41,32 @@
   :ensure t
   :diminish which-key-mode
   :config (which-key-mode))
+
+(use-package hydra
+  :ensure t)
+
+(use-package counsel
+  :ensure t
+  :bind
+  (("M-y" . counsel-yank-pop)
+   :map ivy-minibuffer-map
+   ("M-y" . ivy-next-line)))
+
+(use-package ivy
+  :ensure t
+  :diminish ivy-mode
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-display-style 'fancy)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-wrap t)
+
+  ;; use enter on a directory to navigate into the directory, not open it with dired.
+  (define-key ivy-minibuffer-map (kbd "C-m") 'ivy-alt-done)
+
+  (use-package ivy-hydra
+    :ensure t))
 
 (use-package org
   :ensure t
@@ -53,8 +84,100 @@
   :ensure t
   :config (add-hook 'org-mode-hook (lambda () (org-autolist-mode))))
 
+(use-package worf
+  :ensure t
+  :defer t
+  :init (add-hook 'org-mode-hook 'worf-mode)
+  :config
+  (define-key worf-mode-map (kbd "C-c C-h") 'worf-goto)
+
+  ;; can't type []
+  (define-key worf-mode-map (kbd "[") nil)
+  (define-key worf-mode-map (kbd "]") nil)
+  (worf-define-key worf-mode-map "[" 'worf-forward)
+  (worf-define-key worf-mode-map "]" 'worf-backward))
+
+(use-package evil
+  :ensure t
+  :init
+  (setq evil-want-integration nil)
+  :config
+  ;; enable evil
+  (evil-mode 1)
+
+  ;; put all of this somewhere else lol
+  
+  ;; stop escape being a prefix
+  (define-key key-translation-map (kbd "ESC") (kbd "C-g"))
+
+  ;; make escape quit the minibuffer
+  (define-key evil-normal-state-map [escape] 'keyboard-quit)
+  (define-key evil-visual-state-map [escape] 'keyboard-quit)
+  (define-key minibuffer-local-map [escape] 'abort-recursive-edit)
+  (define-key minibuffer-local-ns-map [escape] 'abort-recursive-edit)
+  (define-key minibuffer-local-completion-map [escape] 'abort-recursive-edit)
+  (define-key minibuffer-local-must-match-map [escape] 'abort-recursive-edit)
+  (define-key minibuffer-local-isearch-map [escape] 'abort-recursive-edit)
+
+  ;; make evil use switch-window
+  (define-key evil-window-map (kbd "C-w") 'switch-window)
+
+  ;; make keys work in normal mode
+  (define-key evil-motion-state-map (kbd "RET") nil)
+  (define-key evil-motion-state-map (kbd "TAB") nil)
+
+  ;; make search case sensitive when there's a capital letter
+  (setq evil-ex-search-case 'sensitive))
+
+(use-package evil-surround
+  :ensure t
+  :config
+  (global-evil-surround-mode 1))
+
+(use-package evil-args
+  :ensure t
+  :init
+  (progn
+    ;; bind evil-args text objects
+    (define-key evil-inner-text-objects-map "a" 'evil-inner-arg)
+    (define-key evil-outer-text-objects-map "a" 'evil-outer-arg)
+
+    ;; bind evil-forward/backward-args
+    (define-key evil-normal-state-map "L" 'evil-forward-arg)
+    (define-key evil-normal-state-map "H" 'evil-backward-arg)
+    (define-key evil-motion-state-map "L" 'evil-forward-arg)
+    (define-key evil-motion-state-map "H" 'evil-backward-arg)
+
+    ;; bind evil-jump-out-args
+    (define-key evil-normal-state-map "K" 'evil-jump-out-args)))
+
+(use-package web-mode
+  :ensure t
+  :mode ("\\.html$" . web-mode)
+  :init
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+
+  (setq web-mode-enable-auto-pairing t)
+  (setq web-mode-enable-auto-expanding t)
+  (setq web-mode-enable-css-colorization t))
+
+(use-package web-beautify
+  :ensure t
+  :commands (web-beautify-css
+             web-beautify-css-buffer
+             web-beautify-html
+             web-beautify-html-buffer
+             web-beautify-js
+             web-beautify-js-buffer))
+
 (use-package switch-window
-  :ensure t)
+  :ensure t
+  :config
+  (setq switch-window-shortcut-style 'qwerty)
+  (setq switch-window-qwerty-shortcuts
+	'("a" "s" "d" "f" "j" "k" "l" ";" "w" "e" "i" "o")))
 
 (use-package winner
   :ensure t
@@ -131,11 +254,6 @@
 
 (add-to-list 'exec-path "C:/Program Files/Git/bin")
 (setenv "PATH" (mapconcat #'identity exec-path path-separator))
-
-(use-package magit
-  :ensure t
-  :config
-  (setq magit-completing-read-function 'ivy-completing-read))
 
 ;; DWIM
 ;; better commenting
@@ -312,3 +430,17 @@ is already narrowed."
 
 (provide 'init)
 ;;; init.el ends here
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (magit auto-yasnippet company smartparens ace-jump-mode iedit expand-region powerline flycheck move-text undo-tree monokai-theme counsel switch-window org-autolist org-bullets which-key try use-package diminish))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
