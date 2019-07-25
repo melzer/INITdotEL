@@ -483,6 +483,7 @@ is already narrowed."
 
 (define-key org-mode-map (kbd "C-c C-d") 'my/img-complete-link)
 
+;; need to check if before headline!
 (defun my/org-render-latex-fragments ()
   "Render org latex fragments on save."
   (save-excursion
