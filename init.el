@@ -6,12 +6,36 @@
 ;; learn how to use reftex
 ;; set up a leader (see spacemacs, evil-leader)
 ;; set up keybindings to go to specific files
+;; learn cedet (semantic-mode for c/c++)
+;; commenting style are cooked (all extra-line even single line)
+;; can't input quotation marks in c
+;; make copy pasting more intuitive (don't save deleted text)!!
+;; tangle init.el??
+;; collect stats on function use --> to optimise
 
+;; evil:
+;; escape brackets
+;; make code blocks automatically go into insert mode -- evil mode settings (evil-collection)
+;; keys for movement when in insert mode (forward, back, delete)
+
+;;; org todos?
 ;; problem with org-toggle-latex (subtree instead of section?)
 ;; make worf-goto highlight current heading (look at source)
-
+;; disable worf except for outline
+;; visual line mode not working sometimes?
+;; writing bold in org-mode (clash with worf)
+;; keybinding for org-store-link
+;; org redisplay inline images on save
+;; command to bold line
 ;; make a big agenda file that tracks all org files(?)
 ;; see org-refile-targets
+;; make tables auto-resize to fit screen (?)
+;; change separator in C-c C-j? (is it called org-jump?)
+;; org capture templates (for plan/thoughts/notes)
+;; org insert image (C-c C-d) in reverse order (newer at the top)
+;; math mode brackets \(\) auto insert
+
+;; latex --> disable prettify-symbols mode
 
 ;;; Code:
 
@@ -101,7 +125,7 @@
   (setq org-goto-interface 'outline-path-completion)
 
   ;; org-latex preview size
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0)))
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.5)))
 
 (use-package org-bullets
   :ensure t
@@ -114,15 +138,16 @@
 (use-package worf
   :ensure t
   :defer t
-  :init (add-hook 'org-mode-hook 'worf-mode)
+  :init (add-hook 'org-mode-hook (lambda () (progn
+					      (worf-mode)
+					      (define-key evil-normal-state-map "[ [" 'worf-forward)
+					      (define-key evil-normal-state-map "] ]" 'worf-backward)
+					      (define-key evil-normal-state-map (kbd "C-c C-h") 'worf-goto)
+					      (define-key evil-insert-state-map (kbd "C-c C-h") 'worf-goto))))
   :config
-  (define-key worf-mode-map (kbd "C-c C-h") 'worf-goto)
-
-  ;; can't type []
   (define-key worf-mode-map (kbd "[") nil)
   (define-key worf-mode-map (kbd "]") nil)
-  (worf-define-key worf-mode-map "[" 'worf-forward)
-  (worf-define-key worf-mode-map "]" 'worf-backward))
+  )
 
 (use-package switch-window
   :ensure t
@@ -134,6 +159,12 @@
 (use-package magit
   :ensure t
   :config (setq magit-completing-read-function 'ivy-completing-read))
+
+(use-package keyfreq
+  :ensure t
+  :config
+  (keyfreq-mode 1)
+  (feyfreq-autosave-mode 1))
 
 (use-package evil
   :ensure t
@@ -483,8 +514,50 @@ is already narrowed."
 (global-set-key (kbd "C-x 2") (lambda () (interactive) (split-window-vertically) (other-window 1)))
 (global-set-key (kbd "C-x 3") (lambda () (interactive) (split-window-horizontally) (other-window 1)))
 
-;; enter worf mode
-(global-set-key (kbd "C-c n") (lambda () (interactive) (worf-backward) (evil-insert 0)))
+(defun split-window-sensibly-prefer-horizontal (&optional window)
+"Based on split-window-sensibly, but designed to prefer a horizontal split,
+i.e. windows tiled side-by-side."
+  (let ((window (or window (selected-window))))
+    (or (and (window-splittable-p window t)
+         ;; Split window horizontally
+         (with-selected-window window
+           (split-window-right)))
+    (and (window-splittable-p window)
+         ;; Split window vertically
+         (with-selected-window window
+           (split-window-below)))
+    (and
+         ;; If WINDOW is the only usable window on its frame (it is
+         ;; the only one or, not being the only one, all the other
+         ;; ones are dedicated) and is not the minibuffer window, try
+         ;; to split it horizontally disregarding the value of
+         ;; `split-height-threshold'.
+         (let ((frame (window-frame window)))
+           (or
+            (eq window (frame-root-window frame))
+            (catch 'done
+              (walk-window-tree (lambda (w)
+                                  (unless (or (eq w window)
+                                              (window-dedicated-p w))
+                                    (throw 'done nil)))
+                                frame)
+              t)))
+     (not (window-minibuffer-p window))
+     (let ((split-width-threshold 0))
+       (when (window-splittable-p window t)
+         (with-selected-window window
+               (split-window-right))))))))
+
+(defun split-window-really-sensibly (&optional window)
+  (let ((window (or window (selected-window))))
+    (if (> (window-total-width window) (* 2 (window-total-height window)))
+        (with-selected-window window (split-window-sensibly-prefer-horizontal window))
+      (with-selected-window window (split-window-sensibly window)))))
+
+(setq
+   split-height-threshold 80
+   split-width-threshold 160
+   split-window-preferred-function 'split-window-really-sensibly)
 
 ;; GUI
 (setq inhibit-startup-message t)
@@ -500,7 +573,8 @@ is already narrowed."
 
 (setq help-window-select t)
 
-(defalias 'list-buffers 'ibuffer-other-window)
+;(defalias 'list-buffers 'ibuffer-other-window)
+(defalias 'list-buffers 'ibuffer)
 
 (defun fix-xresources ()
   "Fix up xresouces theme."
@@ -549,7 +623,7 @@ is already narrowed."
 (electric-pair-mode 1)
 (delete-selection-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p)
-(setq comment-style 'extra-line)
+;; (setq comment-style 'extra-line)
 (global-auto-revert-mode)
 
 ;; Keys
