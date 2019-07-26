@@ -15,8 +15,13 @@
 
 ;; evil:
 ;; escape brackets
-;; make code blocks automatically go into insert mode -- evil mode settings (evil-collection)
+;; make code blocks automatically go into insert mode
 ;; keys for movement when in insert mode (forward, back, delete)
+;; make evil work everywhere (spacemacs??) see evil-collection
+;; need way to escape brackets
+;; vim line numbers?
+
+;; magit -- writing commits go straight into insert mode
 
 ;;; org todos?
 ;; problem with org-toggle-latex (subtree instead of section?)
@@ -36,6 +41,8 @@
 ;; math mode brackets \(\) auto insert
 
 ;; latex --> disable prettify-symbols mode
+
+;; emacs note-taking system (org-capture? write down thoughts)
 
 ;;; Code:
 
