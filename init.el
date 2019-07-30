@@ -108,6 +108,7 @@
   (setq org-file-apps (append org-file-apps '(("\\.pdf::\\([0-9]+\\)\\'" . "zathura -P %1 %s")
 					      ("\\.png\\'" . "sxiv %s")
 					      ("\\.jpg\\'" . "sxiv %s")
+					      ("\\.jpeg\\'" . "sxiv %s")
 					      ("\\.gif\\'" . "sxiv %s"))))
   
   (add-to-list 'org-structure-template-alist
