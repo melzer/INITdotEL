@@ -39,6 +39,7 @@
 ;; org capture templates (for plan/thoughts/notes)
 ;; org insert image (C-c C-d) in reverse order (newer at the top)
 ;; math mode brackets \(\) auto insert
+;; need someway to not automatically turn \(\) into latex for all files --> do a test to make sure it's not added to hook if org file doesn't want previews
 
 ;; latex --> disable prettify-symbols mode
 
@@ -171,7 +172,7 @@
   :ensure t
   :config
   (keyfreq-mode 1)
-  (feyfreq-autosave-mode 1))
+  (keyfreq-autosave-mode 1))
 
 (use-package evil
   :ensure t
