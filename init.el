@@ -9,41 +9,27 @@
 ;; learn cedet (semantic-mode for c/c++)
 ;; commenting style are cooked (all extra-line even single line)
 ;; can't input quotation marks in c
-;; make copy pasting more intuitive (don't save deleted text)!!
 ;; tangle init.el??
-;; collect stats on function use --> to optimise
+;; review stats on function use
+;; how to use use-package properly??
 
 ;; evil:
-;; escape brackets
-;; make code blocks automatically go into insert mode
-;; keys for movement when in insert mode (forward, back, delete)
-;; make evil work everywhere (spacemacs??) see evil-collection
-;; need way to escape brackets
 ;; vim line numbers?
-
-;; magit -- writing commits go straight into insert mode
+;; track modes where evil doesnt work (and add them with evil-collection)
 
 ;;; org todos?
-;; problem with org-toggle-latex (subtree instead of section?)
 ;; make worf-goto highlight current heading (look at source)
 ;; disable worf except for outline
-;; visual line mode not working sometimes?
 ;; writing bold in org-mode (clash with worf)
+;; command to bold line
+;; problem with org-toggle-latex (subtree instead of section?) + test if before first headline
+;; need someway to not automatically turn \(\) into latex for all files --> do a test to make sure it's not added to hook if org file doesn't want previews
 ;; keybinding for org-store-link
 ;; org redisplay inline images on save
-;; command to bold line
 ;; make a big agenda file that tracks all org files(?)
 ;; see org-refile-targets
 ;; make tables auto-resize to fit screen (?)
 ;; change separator in C-c C-j? (is it called org-jump?)
-;; org capture templates (for plan/thoughts/notes)
-;; org insert image (C-c C-d) in reverse order (newer at the top)
-;; math mode brackets \(\) auto insert
-;; need someway to not automatically turn \(\) into latex for all files --> do a test to make sure it's not added to hook if org file doesn't want previews
-
-;; latex --> disable prettify-symbols mode
-
-;; emacs note-taking system (org-capture? write down thoughts)
 
 ;;; Code:
 
@@ -126,8 +112,20 @@
   
   (add-to-list 'org-structure-template-alist
 	       '("r" "\\begin{align*}\n?\n\\end{align*}"))
+
   ;; enable fuzzy search in org-refile
   (setq ivy-initial-inputs-alist (cdr (cdr ivy-initial-inputs-alist)))
+
+  (global-set-key (kbd "C-c c") 'org-capture)
+
+  (setq org-capture-templates
+	'(("n" "Note" entry (file "~/mega/org/notes.org") "* %^{Heading}\n %T\n\n %?\n\n %i" :empty-lines 1 :prepend t)
+	  ("s" "Some day" entry (file "~/mega/org/someday.org") "* %?\n %i" :empty-lines 1 :prepend t)
+	  ("r" "Reading" entry (file+headline "~/mega/lit/lit list.org" "Reading List") "* %?\n %i" :empty-lines 1)
+	  ("w" "Writing" entry (file+headline "~/mega/lit/lit list.org" "Writing List") "* %?\n %i" :empty-lines 1)
+	))
+
+  (setq org-blank-before-new-entry '((heading . t) (plain-list-item . nil)))
   
   ;; org-goto
   (setq org-goto-interface 'outline-path-completion)
@@ -196,6 +194,19 @@
   (define-key minibuffer-local-must-match-map [escape] 'abort-recursive-edit)
   (define-key minibuffer-local-isearch-map [escape] 'abort-recursive-edit)
 
+  ;; start modes in insert state
+  (add-hook 'git-commit-mode-hook 'evil-insert-state)
+  (add-hook 'org-capture-mode-hook 'evil-insert-state)
+  (add-hook 'org-src-mode-hook 'evil-insert-state)
+
+  ;; make pasting better
+  (defun evil-paste-after-from-0 ()
+    (interactive)
+    (let ((evil-this-register ?0))
+      (call-interactively 'evil-paste-after)))
+
+  (define-key evil-visual-state-map "p" 'evil-paste-after-from-0)
+
   ;; make evil use switch-window
   (define-key evil-window-map (kbd "C-w") 'switch-window)
 
@@ -215,6 +226,13 @@
 (use-package evil-magit
   :after evil
   :ensure t)
+
+(use-package evil-org
+  :after org
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook 'evil-org-mode)
+  (add-hook 'evil-org-mode-hook (lambda () (evil-org-set-key-theme))))
 
 (use-package evil-args
   :ensure t
@@ -313,7 +331,6 @@
   :mode ("\\.tex\\'" . latex-mode)
   :init
   (add-hook 'LaTeX-mode-hook (lambda ()
-			       (prettify-symbols-mode)
 			       (turn-on-reftex)
 			       (setq reftex-plug-into-AUCTeX t)
 			       (reftex-isearch-minor-mode)))
@@ -485,7 +502,7 @@ is already narrowed."
 
 (defvar img-d "~/mega/misc/img")
 (defun my/img-complete-link ()
-  "Create an image link using competion."
+  "Create an image link using completion."
   (interactive)
   (org-insert-link nil (concat "file:" (abbreviate-file-name (expand-file-name (read-file-name "Image: " img-d)))) nil))
 
@@ -724,6 +741,41 @@ i.e. windows tiled side-by-side."
   (let ((buffer-backed-up nil))
     (backup-buffer)))
 (add-hook 'before-save-hook  'force-backup-of-buffer)
+
+;; global org-capture
+
+(defadvice org-capture-finalize
+    (after delete-capture-frame activate)
+  "Advise capture-finalize to close the frame."
+  (if (equal "capture" (frame-parameter nil 'name))
+      (delete-frame)))
+
+(defadvice org-capture-destroy
+    (after delete-capture-frame activate)
+  "Advise capture-destroy to close the frame."
+  (if (equal "capture" (frame-parameter nil 'name))
+      (delete-frame)))
+
+(use-package noflet
+  :ensure t)
+
+;; (defun make-capture-frame ()
+;;   "Create a new frame and run 'org-capture'."
+;;   (interactive)
+;;   (make-frame '((name . "capture")))
+;;   (select-frame-by-name "capture")
+;;   (delete-other-windows)
+;;   (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+;; 	  (org-capture)))
+(defun activate-capture-frame ()
+  "run org-capture in capture frame"
+  (select-frame-by-name "capture")
+  ;; (switch-to-buffer (get-buffer-create "*scratch*"))
+  ;; (org-capture)
+  (delete-other-windows)
+
+  (noflet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+	  (org-capture)))
 
 (provide 'init)
 ;;; init.el ends here
