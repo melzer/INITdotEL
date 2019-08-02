@@ -2,35 +2,6 @@
 
 ;;; Commentary:
 
-;; TODO
-;; learn how to use reftex
-;; set up a leader (see spacemacs, evil-leader)
-;; set up keybindings to go to specific files
-;; learn cedet (semantic-mode for c/c++)
-;; commenting style are cooked (all extra-line even single line)
-;; can't input quotation marks in c
-;; tangle init.el??
-;; review stats on function use
-;; how to use use-package properly??
-
-;; evil:
-;; vim line numbers?
-;; track modes where evil doesnt work (and add them with evil-collection)
-
-;;; org todos?
-;; make worf-goto highlight current heading (look at source)
-;; disable worf except for outline
-;; writing bold in org-mode (clash with worf)
-;; command to bold line
-;; problem with org-toggle-latex (subtree instead of section?) + test if before first headline
-;; need someway to not automatically turn \(\) into latex for all files --> do a test to make sure it's not added to hook if org file doesn't want previews
-;; keybinding for org-store-link
-;; org redisplay inline images on save
-;; make a big agenda file that tracks all org files(?)
-;; see org-refile-targets
-;; make tables auto-resize to fit screen (?)
-;; change separator in C-c C-j? (is it called org-jump?)
-
 ;;; Code:
 
 ;; Packages
@@ -119,8 +90,8 @@
   (global-set-key (kbd "C-c c") 'org-capture)
 
   (setq org-capture-templates
-	'(("n" "Note" entry (file "~/mega/org/notes.org") "* %^{Heading}\n %T\n\n %?\n\n %i" :empty-lines 1 :prepend t)
-	  ("s" "Some day" entry (file "~/mega/org/someday.org") "* %?\n %i" :empty-lines 1 :prepend t)
+	'(("n" "Note" entry (file "~/mega/tech/org/notes.org") "* %^{Heading}\n %T\n\n %?\n\n %i" :empty-lines 1 :prepend t)
+	  ("s" "Some day" entry (file "~/mega/tech/org/someday.org") "* %?\n %i" :empty-lines 1 :prepend t)
 	  ("r" "Reading" entry (file+headline "~/mega/lit/lit list.org" "Reading List") "* %?\n %i" :empty-lines 1)
 	  ("w" "Writing" entry (file+headline "~/mega/lit/lit list.org" "Writing List") "* %?\n %i" :empty-lines 1)
 	))
@@ -175,7 +146,8 @@
 (use-package evil
   :ensure t
   :init
-  (setq evil-want-integration nil)
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
   :config
   ;; enable evil
   (evil-mode 1)
@@ -217,6 +189,13 @@
   ;; make search case sensitive when there's a capital letter
   (setq evil-ex-search-case 'sensitive)
 )
+
+(use-package evil-collection
+  :after evil
+  :ensure t
+  :config
+  (evil-collection-init)
+  )
 
 (use-package evil-surround
   :ensure t
