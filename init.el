@@ -101,10 +101,10 @@
   (global-set-key (kbd "C-c c") 'org-capture)
 
   (setq org-capture-templates
-	'(("n" "Note" entry (file "~/mega/tech/org/notes.org") "* %^{Heading}\n %T\n\n %?\n\n %i" :empty-lines 1 :prepend t)
-	  ("s" "Some day" entry (file "~/mega/tech/org/someday.org") "* %?\n %i" :empty-lines 1 :prepend t)
-	  ("r" "Reading" entry (file+headline "~/mega/lit/lit list.org" "Reading List") "* %?\n %i" :empty-lines 1)
-	  ("w" "Writing" entry (file+headline "~/mega/lit/lit list.org" "Writing List") "* %?\n %i" :empty-lines 1)
+	'(("n" "Note" entry (file "~/mega/tech/org/notes.org") "* %^{Heading}\n%T\n\n%?\n\n%i" :empty-lines 1 :prepend t)
+	  ("s" "Some day" entry (file "~/mega/tech/org/someday.org") "* %?\n%i" :empty-lines 1 :prepend t)
+	  ("r" "Reading" entry (file+headline "~/mega/lit/lit list.org" "Reading List") "* %?\n%i" :empty-lines 1)
+	  ("w" "Writing" entry (file+headline "~/mega/lit/lit list.org" "Writing List") "* %?\n%i" :empty-lines 1)
 	))
 
   (setq org-blank-before-new-entry '((heading . t) (plain-list-item . nil)))
