@@ -5,6 +5,7 @@
 ;; TODO
 ;; learn smartparens
 ;; learn how to use reftex/zotero
+;; fix up ace-jump keybindings
 
 ;; magit is so slow on windows, better off using cmder
 
@@ -74,6 +75,11 @@
   (setq org-hide-leading-stars t)
   (setq org-startup-indented t)
   (setq org-edit-src-content-indentation 0)
+
+  (setq org-refile-targets '((nil :maxlevel . 9) (org-agenda-files :maxlevel . 9)))
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-refile-use-outline-path file)
+
   (add-hook 'org-mode-hook #'visual-line-mode))
 
 (use-package org-bullets
@@ -354,12 +360,20 @@ is already narrowed."
 (setq comment-style 'extra-line)
 
 ;; Keys
+
+(defun my/org-toggle-headings ()
+  "Toggle headings in 'org-mode'."
+  (interactive)
+  (org-toggle-heading (org-current-level)))
+
+(define-key org-mode-map (kbd "C-c C-t") 'my/org-toggle-headings)
+
 ;; global
 (bind-keys*
  ("<f5>" . revert-buffer)
  ("C-c r" . query-replace)
  ("M-g" . goto-line)
- ("C-." . ace-jump-mode)
+ ("C-<" . ace-jump-mode)
  ("C-'" . better-comment-dwim)
 
  ;; auto-yasnippet
