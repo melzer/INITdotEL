@@ -101,10 +101,10 @@
   (global-set-key (kbd "C-c c") 'org-capture)
 
   (setq org-capture-templates
-	'(("n" "Note" entry (file "~/mega/tech/org/notes.org") "* %^{Heading}\n%T\n\n%?\n\n%i" :empty-lines 1 :prepend t)
-	  ("s" "Some day" entry (file "~/mega/tech/org/someday.org") "* %?\n%i" :empty-lines 1 :prepend t)
-	  ("r" "Reading" entry (file+headline "~/mega/lit/lit list.org" "Reading List") "* %?\n%i" :empty-lines 1)
-	  ("w" "Writing" entry (file+headline "~/mega/lit/lit list.org" "Writing List") "* %?\n%i" :empty-lines 1)
+	'(("n" "Note" entry (file "~/gdrive/tech/org/notes.org") "* %^{Heading}\n%T\n\n%?\n\n%i" :empty-lines 1 :prepend t)
+	  ("s" "Some day" entry (file "~/gdrive/tech/org/someday.org") "* %?\n%i" :empty-lines 1 :prepend t)
+	  ("r" "Reading" entry (file+headline "~/gdrive/lit/lit list.org" "Reading List") "* %?\n%i" :empty-lines 1)
+	  ("w" "Writing" entry (file+headline "~/gdrive/lit/lit list.org" "Writing List") "* %?\n%i" :empty-lines 1)
 	))
 
   (setq org-blank-before-new-entry '((heading . t) (plain-list-item . nil)))
@@ -122,6 +122,10 @@
 (use-package org-autolist
   :ensure t
   :config (add-hook 'org-mode-hook (lambda () (org-autolist-mode))))
+
+(use-package interleave
+  :ensure t
+  )
 
 (use-package worf
   :ensure t
@@ -337,13 +341,13 @@
   ;; pdf-tools
   
   ;; Update PDF buffers after successful LaTeX runs
-  ;; (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
 
   ;; Use pdfview with auctex
-  ;; (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
-  ;; (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
-  ;; 	TeX-source-correlate-start-server t)
-  ;; (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
+  (add-hook 'LaTeX-mode-hook 'pdf-tools-install)
+  (setq TeX-view-program-selection '((output-pdf "pdf-tools"))
+  	TeX-source-correlate-start-server t)
+  (setq TeX-view-program-list '(("pdf-tools" "TeX-pdf-tools-sync-view")))
 
   ;; zathura
   (add-to-list 'TeX-view-program-selection '(output-pdf "Zathura")))
@@ -359,7 +363,7 @@
   :after latex
   :config
   (add-to-list 'company-backends 'company-bibtex)
-  (setq company-bibtex-bibliography '("~/MEGA/uni/bibliography/references.bib")))
+  (setq company-bibtex-bibliography '("~/gdrive/uni/bibliography/references.bib")))
 
 (use-package pdf-tools
   :after latex
@@ -490,7 +494,7 @@ is already narrowed."
 	(delete-window)
 	(balance-windows))))
 
-(defvar img-d "~/mega/misc/img")
+(defvar img-d "~/gdrive/misc/img")
 (defun my/img-complete-link ()
   "Create an image link using completion."
   (interactive)
